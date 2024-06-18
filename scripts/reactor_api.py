@@ -163,6 +163,17 @@ def reactor_api(_: gr.Blocks, app: FastAPI):
         facemodels = [os.path.split(model)[1].split(".")[0] for model in get_facemodels()]
         return {"facemodels": facemodels}
 
+    @app.post("/reactor/blend_facemodels")
+    async def blend_facemodels(
+        source_images: list[str] = Body([""],title="Source Face Image List"),
+        name: str = Body("",title="Face Model Name"),
+        compute_method: int = Body(0,title="Compute Method (Mean, Median, Mode)"),
+        shape_check: bool = Body(False,title="Check Embedding Shape"),
+    ):
+        images = [api.decode_base64_to_image(img) for img in source_images]
+        blend_faces(images, name, compute_method, shape_check, is_api=True)
+        facemodels = [os.path.split(model)[1].split(".")[0] for model in get_facemodels()]
+        return {"facemodels": facemodels}
 try:
     import modules.script_callbacks as script_callbacks
 
